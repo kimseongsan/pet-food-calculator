@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>반려동물 사료량 계산기 | 강아지·고양이 하루 급여량 무료 계산</title>
+<meta name="description" content="강아지, 고양이의 체중과 나이만 입력하면 하루 필요 칼로리(DER)와 사료 급여량(g)을 바로 계산해드려요. 수의사 가이드라인(WSAVA·AAHA) 기반의 무료 반려동물 사료량 계산기입니다.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://example.com/">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="반려동물 사료량 계산기 | 강아지·고양이 하루 급여량 무료 계산">
+<meta property="og:description" content="체중과 나이만 입력하면 하루 필요 칼로리와 사료 급여량을 바로 알려드려요.">
+<!-- TODO: 실제 대표 이미지로 교체 (1200x630 권장) -->
+<meta property="og:image" content="https://example.com/assets/og-image.png">
+<meta property="og:url" content="https://example.com/">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <a href="/" class="logo" aria-label="반려동물 사료량 계산기 홈으로">🐾 사료량 계산기</a>
+  <nav class="site-nav" aria-label="주요 메뉴">
+    <a href="/faq.html">FAQ</a>
+    <a href="/blog/">블로그</a>
+    <a href="/about.html">소개</a>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ===================== 간편모드 ===================== -->
+  <section id="simple-mode" class="mode-section">
+    <h1>반려동물 사료량 계산기</h1>
+    <p class="subtitle">체중과 나이만 입력하면 하루 필요 칼로리와 사료량을 바로 알려드려요.</p>
+
+    <form id="simple-form" class="card" novalidate>
+      <div class="form-group">
+        <span id="simple-species-label">반려동물 종류</span>
+        <div class="chip-group" role="group" aria-labelledby="simple-species-label">
+          <button type="button" class="chip" data-species-simple="dog" aria-pressed="true" aria-label="강아지 선택">🐶 강아지</button>
+          <button type="button" class="chip" data-species-simple="cat" aria-pressed="false" aria-label="고양이 선택">🐱 고양이</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="simple-weight">체중 (kg)</label>
+        <input type="number" id="simple-weight" inputmode="decimal" step="0.1" min="0.1" placeholder="예: 3.5" aria-describedby="simple-weight-error">
+        <p class="field-error" id="simple-weight-error" role="alert"></p>
+      </div>
+
+      <div class="form-group">
+        <span id="simple-age-label">나이</span>
+        <div class="field-row" role="group" aria-labelledby="simple-age-label">
+          <div>
+            <label for="simple-age-years" class="visually-hidden">나이(년)</label>
+            <select id="simple-age-years" aria-label="나이 - 년">
+              <!-- options는 아래 스크립트가 없어도 보이도록 정적 생성 -->
+            </select>
+          </div>
+          <div>
+            <label for="simple-age-months" class="visually-hidden">나이(개월)</label>
+            <select id="simple-age-months" aria-label="나이 - 개월">
+            </select>
+          </div>
+        </div>
+        <p class="field-hint">
+          임신·수유 중이라면
+          <a href="#" id="goto-detail-preg" class="small-link">상세모드에서 직접 선택하세요</a>
+        </p>
+      </div>
+
+      <button type="submit" class="btn btn-primary">계산하기</button>
+    </form>
+
+    <div id="simple-result" class="result-box hidden" aria-live="polite">
+      <p id="simple-result-text" class="result-headline"></p>
+      <div class="result-kcal" id="simple-der-value">-</div>
+      <p class="result-sub" id="simple-gram-estimate"></p>
+
+      <div class="assumption-badges">
+        <span class="badge" id="simple-lifestage-label">-</span>
+        <span class="badge">활동량: 보통 가정</span>
+        <span class="badge">중성화: 완료 가정</span>
+      </div>
+
+      <p class="result-note">실제 먹이는 사료에 따라 g수가 달라질 수 있어요. 정확한 칼로리를 알고 있다면 상세모드에서 직접 입력해보세요.</p>
+
+      <div class="btn-row">
+        <button type="button" class="btn btn-secondary" id="simple-search-food">🔍 사료 이름으로 정확히 찾기</button>
+        <button type="button" class="btn btn-primary" id="goto-detail">🎯 더 정확하게 계산하기</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 상세모드 ===================== -->
+  <section id="detail-mode" class="mode-section hidden">
+    <button type="button" class="btn btn-ghost btn-sm" id="back-to-simple" aria-label="간편모드로 돌아가기">← 간편모드로</button>
+    <h2>상세 계산기</h2>
+    <p class="subtitle">활동량, 중성화 여부, 실제 사료 칼로리까지 반영해 더 정확하게 계산해요.</p>
+
+    <form id="detail-form" class="card" novalidate>
+
+      <div class="form-group">
+        <span id="detail-species-label">반려동물 종류</span>
+        <div class="chip-group" role="group" aria-labelledby="detail-species-label">
+          <button type="button" class="chip" data-species-detail="dog" aria-pressed="true" aria-label="강아지 선택">🐶 강아지</button>
+          <button type="button" class="chip" data-species-detail="cat" aria-pressed="false" aria-label="고양이 선택">🐱 고양이</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="detail-weight">체중 (kg)</label>
+        <input type="number" id="detail-weight" inputmode="decimal" step="0.1" min="0.1" placeholder="예: 3.5" aria-describedby="detail-weight-error">
+        <p class="field-error" id="detail-weight-error" role="alert"></p>
+      </div>
+
+      <div class="form-group">
+        <span id="detail-age-label">나이</span>
+        <div class="field-row" role="group" aria-labelledby="detail-age-label">
+          <div>
+            <label for="detail-age-years" class="visually-hidden">나이(년)</label>
+            <select id="detail-age-years" aria-label="나이 - 년"></select>
+          </div>
+          <div>
+            <label for="detail-age-months" class="visually-hidden">나이(개월)</label>
+            <select id="detail-age-months" aria-label="나이 - 개월"></select>
+          </div>
+        </div>
+        <p class="field-hint">자동 판정된 생애주기: <strong id="detail-lifestage-badge">-</strong></p>
+      </div>
+
+      <div class="form-group">
+        <label for="detail-repro">임신·수유 상태</label>
+        <select id="detail-repro">
+          <option value="none">해당 없음</option>
+          <option value="pregnant">임신 중</option>
+          <option value="lactating">수유 중</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="detail-activity-group">
+        <label for="detail-activity">활동량</label>
+        <select id="detail-activity">
+          <option value="low">낮음 (실내 위주, 활동량 적음)</option>
+          <option value="normal" selected>보통 (하루 1~2회 산책/놀이)</option>
+          <option value="high">높음 (활발함, 운동량 많음)</option>
+          <option value="veryhigh">매우 높음 (작업견/스포츠견 등)</option>
+        </select>
+        <p class="field-hint" id="detail-activity-note"></p>
+      </div>
+
+      <div class="form-group" id="detail-neuter-group">
+        <label for="detail-neuter">중성화 여부</label>
+        <select id="detail-neuter">
+          <option value="neutered" selected>완료</option>
+          <option value="intact">미완료</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="detail-food-search">사료 이름으로 검색 (준비 중)</label>
+        <!-- TODO: 3차 스테이지 9단계에서 Supabase foods 테이블 기반 실제 검색으로 교체 -->
+        <input type="text" id="detail-food-search" placeholder="사료 데이터베이스 연동은 추후 지원 예정입니다" disabled aria-describedby="detail-food-search-hint">
+        <p class="field-hint" id="detail-food-search-hint">지금은 아래 항목에 사료 정보를 직접 입력해주세요.</p>
+      </div>
+
+      <div class="form-group">
+        <span id="detail-foodtype-label">사료 종류</span>
+        <div class="chip-group" role="group" aria-labelledby="detail-foodtype-label">
+          <button type="button" class="chip" data-foodtype="dry" aria-pressed="true" aria-label="건식 사료 선택">🥣 건식</button>
+          <button type="button" class="chip" data-foodtype="wet" aria-pressed="false" aria-label="습식 사료 선택">🥫 습식</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="detail-kcal100">사료 100g당 칼로리 (kcal)</label>
+        <input type="number" id="detail-kcal100" inputmode="decimal" min="1" placeholder="예: 380 (제품 포장지 참고)">
+      </div>
+
+      <div class="form-group" id="detail-cup-weight-group">
+        <label for="detail-cup-weight">사료 1컵(180ml)당 무게 (g) — 선택</label>
+        <input type="number" id="detail-cup-weight" inputmode="decimal" min="1" placeholder="미입력 시 90g으로 추정">
+      </div>
+
+      <button type="submit" class="btn btn-primary">계산하기</button>
+    </form>
+
+    <div id="detail-result" class="result-box hidden" aria-live="polite">
+      <div class="assumption-badges">
+        <span class="badge" id="detail-lifestage-badge-result">-</span>
+      </div>
+      <p class="result-headline">하루 필요 칼로리(DER)</p>
+      <div class="result-kcal" id="detail-der-value">-</div>
+
+      <div id="detail-gram-block" class="hidden">
+        <p class="result-sub">1일 총 급여량: <strong id="detail-daily-gram">-</strong></p>
+        <p class="result-sub" id="detail-per-meal">-</p>
+      </div>
+      <p class="result-note hidden" id="detail-kcal100-missing">100g당 칼로리를 입력하면 정확한 g수를 계산해드려요.</p>
+
+      <div id="visual-wrap" class="visual-wrap hidden">
+        <div id="visual-svg-wrap"></div>
+        <p class="visual-caption" id="visual-caption"></p>
+        <div class="shape-picker" id="shape-picker">
+          <button type="button" class="shape-btn" data-shape="circle" aria-pressed="true" aria-label="원형 모양">●</button>
+          <button type="button" class="shape-btn" data-shape="star" aria-pressed="false" aria-label="별 모양">★</button>
+          <button type="button" class="shape-btn" data-shape="heart" aria-pressed="false" aria-label="하트 모양">♥</button>
+          <button type="button" class="shape-btn" data-shape="triangle" aria-pressed="false" aria-label="삼각형 모양">▲</button>
+          <button type="button" class="shape-btn" data-shape="bar" aria-pressed="false" aria-label="막대 모양">▬</button>
+        </div>
+      </div>
+
+      <p class="disclaimer">이 결과는 일반적인 계산식(RER/DER, WSAVA·AAHA 반려동물 영양 가이드라인 참고) 기준의 참고용 수치이며, 정확한 급여량은 반드시 수의사와 상담하세요.</p>
+
+      <!-- 사료 소진일 계산 -->
+      <div class="card" style="text-align:left; margin-top:18px;">
+        <h2>📅 사료 소진 예상일</h2>
+        <div class="form-group">
+          <label for="food-total-amount">구매한 사료 총량</label>
+          <div class="field-row">
+            <input type="number" id="food-total-amount" inputmode="decimal" min="0.1" placeholder="예: 3">
+            <select id="food-total-unit" aria-label="단위">
+              <option value="kg" selected>kg</option>
+              <option value="g">g</option>
+            </select>
+          </div>
+        </div>
+        <p id="depletion-result" class="field-hint">사료 총량을 입력하면 소진 예상일을 계산해드려요.</p>
+        <div id="depletion-actions" class="btn-row hidden">
+          <button type="button" class="btn btn-secondary" id="ics-download">.ics 파일 다운로드</button>
+          <button type="button" class="btn btn-secondary" id="google-calendar-add">구글 캘린더에 추가</button>
+        </div>
+      </div>
+
+      <!-- 광고 자리 1 -->
+      <div class="ad-slot" id="adsense-slot-1" aria-hidden="true">
+        <!-- TODO: 애드센스 승인 후 실제 코드 삽입 -->
+        광고 영역
+      </div>
+
+      <!-- 제휴 링크 자리 -->
+      <div class="affiliate-box">
+        <a href="#" id="affiliate-link" class="btn btn-secondary" style="width:100%;">
+          <!-- TODO: 쿠팡파트너스 승인 후 발급 링크로 교체 -->
+          🛒 추천 사료 보러 가기
+        </a>
+        <p class="affiliate-disclosure">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
+      </div>
+
+      <!-- 공유/인쇄 -->
+      <div class="btn-row share-row">
+        <button type="button" class="btn btn-ghost btn-sm" id="copy-link-btn">🔗 결과 링크 복사</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="kakao-share-btn">💬 카카오톡 공유</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="print-btn">🖨️ 인쇄하기</button>
+      </div>
+
+      <!-- 광고 자리 2 -->
+      <div class="ad-slot" id="adsense-slot-2" aria-hidden="true">
+        <!-- TODO: 애드센스 승인 후 실제 코드 삽입 -->
+        광고 영역
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <nav aria-label="하단 메뉴">
+      <a href="/faq.html">FAQ</a>
+      <a href="/blog/">블로그</a>
+      <a href="/about.html">소개/문의</a>
+      <a href="/privacy.html">개인정보처리방침</a>
+      <a href="/terms.html">이용약관</a>
+    </nav>
+    <p>본 계산기의 결과는 일반적인 가이드라인 기준의 참고용 수치이며, 의학적 조언을 대체하지 않습니다. 정확한 급여량은 반드시 수의사와 상담하세요.</p>
+    <p>© 2026 반려동물 사료량 계산기</p>
+  </div>
+</footer>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+  // 나이 선택 드롭다운(년/월)을 정적으로 채워넣는다.
+  (function () {
+    function fillSelect(id, max) {
+      var select = document.getElementById(id);
+      for (var i = 0; i <= max; i++) {
+        var opt = document.createElement("option");
+        opt.value = i;
+        opt.textContent = i;
+        select.appendChild(opt);
+      }
+    }
+    fillSelect("simple-age-years", 20);
+    fillSelect("simple-age-months", 11);
+    fillSelect("detail-age-years", 20);
+    fillSelect("detail-age-months", 11);
+  })();
+</script>
+<script src="js/calculator.js"></script>
+<script src="js/visual.js"></script>
+<script src="js/calendar.js"></script>
+<script src="js/share.js"></script>
+</body>
+</html>
