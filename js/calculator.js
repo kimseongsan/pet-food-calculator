@@ -142,7 +142,6 @@
     foodType: "dry",
     kcal100: null,
     cupWeight: 90,
-    shape: "circle",
     foodTotalAmount: null,
     foodTotalUnit: "g",
     mode: "simple"
@@ -447,8 +446,7 @@
         window.PetCalcVisual.render({
           foodType: state.foodType,
           dailyGram: dailyGram,
-          cupWeight: state.cupWeight,
-          shape: state.shape
+          cupWeight: state.cupWeight
         });
       }
       if (window.PetCalcCalendar) {
@@ -546,10 +544,6 @@
     computeDER: computeDER,
     computeRER: computeRER,
     getLifeStage: getLifeStage,
-    totalMonthsFrom: totalMonthsFrom,
-    setShape: function (shape) {
-      state.shape = shape;
-      saveState(state);
-    }
+    totalMonthsFrom: totalMonthsFrom
   };
 })();

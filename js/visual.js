@@ -1,25 +1,14 @@
 /* ==========================================================================
    반려동물 사료량 계산기 - 급여량 시각화 (SVG)
-   - 건식: 종이컵 실루엣 + 사료 모양 흩뿌림
-   - 습식: 숟가락 실루엣
-   window.PetCalcVisual.render({foodType, dailyGram, cupWeight, shape}) 호출로 그려진다.
+   - 건식: 종이컵 실루엣, 자연스러운 그라데이션으로 채워지는 사료량 표현
+   - 습식: 스테인리스 숟가락 실루엣
+   window.PetCalcVisual.render({foodType, dailyGram, cupWeight}) 호출로 그려진다.
    ========================================================================== */
 
 (function () {
   "use strict";
 
   var TABLESPOON_ML = 15; // 큰술 1스푼 = 15ml, 물과 밀도가 비슷하다고 가정해 g ≈ ml로 취급
-
-  var CUP_SCATTER_POINTS = [
-    [45, 130], [65, 130], [55, 115], [40, 110], [70, 112],
-    [50, 95], [62, 97], [75, 90], [38, 90], [58, 80],
-    [45, 70], [68, 68], [55, 55], [42, 45], [65, 45], [52, 32]
-  ];
-
-  var SPOON_SCATTER_POINTS = [
-    [30, 55], [45, 40], [60, 65], [75, 42], [90, 58],
-    [40, 62], [70, 30], [55, 50], [25, 45], [80, 50]
-  ];
 
   function gcd(a, b) {
     return b ? gcd(b, a % b) : a;
@@ -51,126 +40,111 @@
     return f.whole + "과 " + f.num + "/" + f.den + unitLabel;
   }
 
-  function shapeMarkup(shape, cx, cy, size, color) {
-    switch (shape) {
-      case "star":
-        return '<polygon points="' + starPoints(cx, cy, size / 2, size / 4.2, 5) + '" fill="' + color + '"/>';
-      case "heart":
-        return heartMarkup(cx, cy, size, color);
-      case "triangle":
-        return (
-          '<polygon points="' +
-          cx + "," + (cy - size / 1.7) + " " +
-          (cx - size / 1.7) + "," + (cy + size / 2.2) + " " +
-          (cx + size / 1.7) + "," + (cy + size / 2.2) +
-          '" fill="' + color + '"/>'
-        );
-      case "bar":
-        return (
-          '<rect x="' + (cx - size * 0.65) + '" y="' + (cy - size * 0.22) +
-          '" width="' + size * 1.3 + '" height="' + size * 0.44 +
-          '" rx="' + size * 0.2 + '" fill="' + color + '"/>'
-        );
-      case "circle":
-      default:
-        return '<circle cx="' + cx + '" cy="' + cy + '" r="' + size / 2 + '" fill="' + color + '"/>';
-    }
-  }
-
-  function starPoints(cx, cy, outerR, innerR, points) {
-    var step = Math.PI / points;
-    var pts = [];
-    for (var i = 0; i < 2 * points; i++) {
-      var r = i % 2 === 0 ? outerR : innerR;
-      var angle = i * step - Math.PI / 2;
-      pts.push((cx + r * Math.cos(angle)).toFixed(1) + "," + (cy + r * Math.sin(angle)).toFixed(1));
-    }
-    return pts.join(" ");
-  }
-
-  function heartMarkup(cx, cy, size, color) {
-    var s = size / 2;
-    var d =
-      "M" + cx + "," + (cy + s * 0.6) +
-      " C" + (cx - s * 1.3) + "," + (cy - s * 0.4) + " " + (cx - s * 0.5) + "," + (cy - s * 1.3) + " " + cx + "," + (cy - s * 0.4) +
-      " C" + (cx + s * 0.5) + "," + (cy - s * 1.3) + " " + (cx + s * 1.3) + "," + (cy - s * 0.4) + " " + cx + "," + (cy + s * 0.6) +
-      " Z";
-    return '<path d="' + d + '" fill="' + color + '"/>';
-  }
-
-  function buildCupSVG(ratio, shape) {
+  /* ------------------------------------------------------------------
+     종이컵 SVG — 트레이싱한 컵 실루엣 + 사료 질감을 흉내낸 그라데이션 채움
+     ------------------------------------------------------------------ */
+  function buildCupSVG(ratio) {
     var clampedRatio = Math.max(0, Math.min(1, ratio));
-    var top = 15, bottom = 145;
+    var top = 18, bottom = 148;
     var fillTopY = bottom - clampedRatio * (bottom - top);
+    var hasFill = clampedRatio > 0.02;
 
     var svg =
-      '<svg viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="사료 채움 정도를 보여주는 컵 그림">' +
-      '<clipPath id="cupClip"><path d="M10,15 L110,15 L90,145 L30,145 Z"/></clipPath>' +
-      '<path d="M10,15 L110,15 L90,145 L30,145 Z" fill="#fff7ec" stroke="#e8792f" stroke-width="3"/>' +
-      '<ellipse cx="60" cy="15" rx="50" ry="6" fill="#fff" stroke="#e8792f" stroke-width="3"/>' +
-      '<g clip-path="url(#cupClip)">' +
-      '<rect x="0" y="' + fillTopY + '" width="120" height="' + (bottom - fillTopY) + '" fill="#ffd8ac"/>';
+      '<svg viewBox="0 0 120 165" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="사료 채움 정도를 보여주는 컵 그림">' +
+      "<defs>" +
+      '<linearGradient id="kibbleFill" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0%" stop-color="#f0c078"/>' +
+      '<stop offset="55%" stop-color="#d99a4e"/>' +
+      '<stop offset="100%" stop-color="#c07f38"/>' +
+      "</linearGradient>" +
+      '<linearGradient id="cupBody" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0%" stop-color="#ffffff"/>' +
+      '<stop offset="100%" stop-color="#f6f3ee"/>' +
+      "</linearGradient>" +
+      '<clipPath id="cupClip"><path d="M12,18 L108,18 L90,148 L30,148 Z"/></clipPath>' +
+      "</defs>" +
+      '<path d="M12,18 L108,18 L90,148 L30,148 Z" fill="url(#cupBody)" stroke="#d8cdbb" stroke-width="2.5"/>' +
+      '<g clip-path="url(#cupClip)">';
 
-    CUP_SCATTER_POINTS.forEach(function (p) {
-      if (p[1] >= fillTopY - 4) {
-        svg += shapeMarkup(shape, p[0], p[1], 12, "#e8792f");
-      }
-    });
+    if (hasFill) {
+      svg +=
+        '<rect x="0" y="' + fillTopY + '" width="120" height="' + (bottom - fillTopY) + '" fill="url(#kibbleFill)"/>' +
+        '<ellipse cx="60" cy="' + fillTopY + '" rx="34" ry="5" fill="#f7d59a" opacity="0.75"/>';
+    }
 
-    svg += "</g></svg>";
+    svg +=
+      "</g>" +
+      '<path d="M12,18 L108,18 L90,148 L30,148 Z" fill="none" stroke="#d8cdbb" stroke-width="2.5"/>' +
+      '<ellipse cx="60" cy="18" rx="48" ry="7" fill="#ffffff" stroke="#d8cdbb" stroke-width="2.5"/>' +
+      "</svg>";
     return svg;
   }
 
+  /* ------------------------------------------------------------------
+     숟가락 SVG — 스테인리스 질감 그라데이션 + 사료(습식) 채움
+     ------------------------------------------------------------------ */
   function buildSpoonSVG(ratio) {
     var clampedRatio = Math.max(0, Math.min(1, ratio));
-    var cx = 55, cy = 50, rx = 45, ry = 32;
+    var cx = 55, cy = 52, rx = 46, ry = 33;
     var bowlTop = cy - ry, bowlBottom = cy + ry;
     var fillTopY = bowlBottom - clampedRatio * (bowlBottom - bowlTop);
+    var hasFill = clampedRatio > 0.02;
 
     var svg =
-      '<svg viewBox="0 0 170 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="사료 채움 정도를 보여주는 숟가락 그림">' +
+      '<svg viewBox="0 0 175 105" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="사료 채움 정도를 보여주는 숟가락 그림">' +
+      "<defs>" +
+      '<linearGradient id="steel" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0%" stop-color="#fbfbfc"/>' +
+      '<stop offset="45%" stop-color="#e3e6ea"/>' +
+      '<stop offset="100%" stop-color="#c7ccd3"/>' +
+      "</linearGradient>" +
+      '<linearGradient id="wetFill" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0%" stop-color="#e8a06a"/>' +
+      '<stop offset="60%" stop-color="#c67a45"/>' +
+      '<stop offset="100%" stop-color="#a8632f"/>' +
+      "</linearGradient>" +
       '<clipPath id="spoonClip"><ellipse cx="' + cx + '" cy="' + cy + '" rx="' + rx + '" ry="' + ry + '"/></clipPath>' +
-      '<rect x="95" y="44" width="70" height="12" rx="6" fill="#fff7ec" stroke="#e8792f" stroke-width="3"/>' +
-      '<ellipse cx="' + cx + '" cy="' + cy + '" rx="' + rx + '" ry="' + ry + '" fill="#fff7ec" stroke="#e8792f" stroke-width="3"/>' +
-      '<g clip-path="url(#spoonClip)">' +
-      '<rect x="0" y="' + fillTopY + '" width="110" height="' + (bowlBottom - fillTopY) + '" fill="#ffd8ac"/>';
+      "</defs>" +
+      '<rect x="98" y="46" width="72" height="13" rx="6.5" fill="url(#steel)" stroke="#c7ccd3" stroke-width="1.5"/>' +
+      '<ellipse cx="' + cx + '" cy="' + cy + '" rx="' + rx + '" ry="' + ry + '" fill="url(#steel)" stroke="#c7ccd3" stroke-width="1.5"/>' +
+      '<g clip-path="url(#spoonClip)">';
 
-    SPOON_SCATTER_POINTS.forEach(function (p) {
-      if (p[1] >= fillTopY - 4) {
-        svg += shapeMarkup("circle", p[0], p[1], 8, "#e8792f");
-      }
-    });
+    if (hasFill) {
+      svg +=
+        '<rect x="0" y="' + fillTopY + '" width="115" height="' + (bowlBottom - fillTopY) + '" fill="url(#wetFill)"/>' +
+        '<ellipse cx="' + cx + '" cy="' + fillTopY + '" rx="28" ry="4.5" fill="#f0b98a" opacity="0.7"/>';
+    }
 
-    svg += "</g></svg>";
+    svg +=
+      "</g>" +
+      '<ellipse cx="' + cx + '" cy="' + cy + '" rx="' + rx + '" ry="' + ry + '" fill="none" stroke="#c7ccd3" stroke-width="1.5"/>' +
+      "</svg>";
     return svg;
   }
 
   function render(opts) {
     var container = document.getElementById("visual-svg-wrap");
-    var captionEl = document.getElementById("visual-caption");
-    var shapePicker = document.getElementById("shape-picker");
+    var captionMainEl = document.getElementById("visual-caption-main");
+    var captionSubEl = document.getElementById("visual-caption-sub");
     if (!container) return;
+
+    var gramLabel = Math.round(opts.dailyGram) + "g";
 
     if (opts.foodType === "dry") {
       var cupWeight = opts.cupWeight && opts.cupWeight > 0 ? opts.cupWeight : 90;
       var cups = opts.dailyGram / cupWeight;
       var ratio = cups > 1 ? 1 : cups;
-      container.innerHTML = buildCupSVG(ratio, opts.shape || "circle");
+      container.innerHTML = buildCupSVG(ratio);
       var cupLabel = formatMixedFraction(cups, 4, "컵");
-      captionEl.innerHTML =
-        "약 " + cupLabel + " (약 " + Math.round(opts.dailyGram) + "g) · 사료 1컵(180ml) ≈ " + cupWeight + "g 기준<br>" +
-        "사료 알갱이 크기·브랜드에 따라 부피가 달라질 수 있어요. 정확한 계량은 저울 사용을 권장합니다.<br>" +
-        "실제 알갱이 개수가 아닌, 모양과 채움 정도를 보여주는 예시 이미지입니다.";
-      if (shapePicker) shapePicker.classList.remove("hidden");
+      captionMainEl.textContent = "하루 " + gramLabel + " (컵으로는 약 " + cupLabel + ") 정도 주시면 돼요";
+      captionSubEl.textContent = "알갱이 크기·브랜드에 따라 다를 수 있어요. 정확한 계량은 저울을 추천해요.";
     } else {
       var tbsp = opts.dailyGram / TABLESPOON_ML;
       var ratio2 = tbsp > 1 ? 1 : tbsp;
       container.innerHTML = buildSpoonSVG(ratio2);
       var tbspLabel = formatMixedFraction(tbsp, 2, "큰술");
-      captionEl.innerHTML =
-        "약 " + tbspLabel + " (약 " + Math.round(opts.dailyGram) + "g)<br>" +
-        "실제 질감·양은 사료 브랜드에 따라 다를 수 있어요. 참고용 예시입니다.";
-      if (shapePicker) shapePicker.classList.add("hidden");
+      captionMainEl.textContent = "하루 " + gramLabel + " (큰술로는 약 " + tbspLabel + ") 정도 주시면 돼요";
+      captionSubEl.textContent = "실제 질감·양은 사료 브랜드에 따라 다를 수 있어요. 참고용 예시예요.";
     }
 
     document.getElementById("visual-wrap").classList.remove("hidden");
@@ -180,31 +154,6 @@
     // 사료 종류가 바뀌면 상세 계산을 다시 실행해야 시각화가 갱신되므로 여기서는 별도 처리하지 않는다.
     // (calculator.js의 폼 재제출 시 render()가 다시 호출됨)
   }
-
-  document.addEventListener("DOMContentLoaded", function () {
-    var shapeButtons = document.querySelectorAll("[data-shape]");
-    shapeButtons.forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        shapeButtons.forEach(function (b) {
-          b.setAttribute("aria-pressed", "false");
-        });
-        btn.setAttribute("aria-pressed", "true");
-        var shape = btn.dataset.shape;
-        if (window.PetCalc) window.PetCalc.setShape(shape);
-
-        var state = window.PetCalc ? window.PetCalc.getState() : null;
-        if (state && state.foodType === "dry") {
-          var container = document.getElementById("visual-svg-wrap");
-          if (container && container.innerHTML) {
-            var lastGram = parseFloat(document.getElementById("detail-daily-gram").textContent);
-            if (lastGram) {
-              render({ foodType: "dry", dailyGram: lastGram, cupWeight: state.cupWeight, shape: shape });
-            }
-          }
-        }
-      });
-    });
-  });
 
   window.PetCalcVisual = {
     render: render,
