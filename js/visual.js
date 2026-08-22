@@ -136,7 +136,7 @@
       var ratio = cups > 1 ? 1 : cups;
       container.innerHTML = buildCupSVG(ratio);
       var cupLabel = formatMixedFraction(cups, 4, "컵");
-      captionMainEl.textContent = "하루 " + gramLabel + " (컵으로는 약 " + cupLabel + ") 정도 주시면 돼요";
+      captionMainEl.textContent = "하루 " + gramLabel + " (종이컵으로는 약 " + cupLabel + ") 정도 주시면 돼요";
       captionSubEl.textContent = "알갱이 크기·브랜드에 따라 다를 수 있어요. 정확한 계량은 저울을 추천해요.";
     } else {
       var tbsp = opts.dailyGram / TABLESPOON_ML;
@@ -155,8 +155,20 @@
     // (calculator.js의 폼 재제출 시 render()가 다시 호출됨)
   }
 
+  /**
+   * SVG 없이 "약 3/4컵" 형태의 종이컵 어림값 문구만 필요한 곳(간편모드 등)에서 사용한다.
+   * @param {number} grams 하루 급여량(g)
+   * @param {number} [cupWeight] 종이컵(180ml) 1컵당 무게(g), 기본 90g
+   */
+  function estimateCupText(grams, cupWeight) {
+    var weight = cupWeight && cupWeight > 0 ? cupWeight : 90;
+    var cups = grams / weight;
+    return formatMixedFraction(cups, 4, "컵");
+  }
+
   window.PetCalcVisual = {
     render: render,
-    onFoodTypeChange: onFoodTypeChange
+    onFoodTypeChange: onFoodTypeChange,
+    estimateCupText: estimateCupText
   };
 })();

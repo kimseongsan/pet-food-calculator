@@ -272,6 +272,15 @@
     $("simple-der-value").textContent = der.toLocaleString("ko-KR") + " kcal";
     $("simple-gram-estimate").textContent =
       "일반 건식 사료(100g당 약 " + AVERAGE_DRY_KCAL_PER_100G + "kcal) 기준으로는 약 " + grams + "g 정도예요.";
+
+    var cupEstimateEl = $("simple-cup-estimate");
+    if (cupEstimateEl) {
+      var cupText = window.PetCalcVisual ? window.PetCalcVisual.estimateCupText(grams) : null;
+      cupEstimateEl.textContent = cupText
+        ? "집에 있는 일반 종이컵(180ml)으로는 약 " + cupText + " 정도예요."
+        : "";
+    }
+
     $("simple-lifestage-label").textContent = result.stage.label;
 
     $("simple-result").classList.remove("hidden");

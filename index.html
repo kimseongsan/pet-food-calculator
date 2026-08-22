@@ -84,6 +84,7 @@
       <p id="simple-result-text" class="result-headline"></p>
       <div class="result-kcal" id="simple-der-value">-</div>
       <p class="result-sub" id="simple-gram-estimate"></p>
+      <p class="result-note" id="simple-cup-estimate"></p>
 
       <div class="assumption-badges">
         <span class="badge" id="simple-lifestage-label">-</span>
@@ -186,8 +187,9 @@
       </div>
 
       <div class="form-group" id="detail-cup-weight-group">
-        <label for="detail-cup-weight">사료 1컵(180ml)당 무게 (g) — 선택</label>
+        <label for="detail-cup-weight">일반 종이컵(180ml) 기준 사료 무게 (g) — 선택</label>
         <input type="number" id="detail-cup-weight" inputmode="decimal" min="1" placeholder="미입력 시 90g으로 추정">
+        <p class="field-hint">집에 있는 일반 종이컵 한 컵(180ml)에 사료를 담으면 대략 몇 g인지 입력해주세요.</p>
       </div>
 
       <button type="submit" class="btn btn-primary">계산하기</button>
