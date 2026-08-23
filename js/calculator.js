@@ -27,6 +27,22 @@
     veryhigh: 1.4 // 작업견/스포츠견 등 매우 활동적인 경우
   };
 
+  // 활동량 배수는 강아지·고양이가 동일하지만, 실제 생활 패턴이 달라 선택지 문구는 종별로 다르게 보여준다.
+  var ACTIVITY_LABELS = {
+    dog: {
+      low: "낮음 (실내 위주, 산책 거의 없음)",
+      normal: "보통 (하루 1~2회 산책)",
+      high: "높음 (활발하게 뛰어놀거나 산책이 많음)",
+      veryhigh: "매우 높음 (작업견·사역견 등)"
+    },
+    cat: {
+      low: "낮음 (거의 움직이지 않는 실내 생활)",
+      normal: "보통 (평범한 실내 생활, 놀이시간 있음)",
+      high: "높음 (자유롭게 뛰어놀거나 외출이 잦음)",
+      veryhigh: "매우 높음 (매우 활동적이거나 외출이 자유로움)"
+    }
+  };
+
   // 미중성화(intact) 동물은 중성화 동물보다 대사 요구량이 높다.
   // WSAVA 가이드라인 기준 성견 미중성화 1.8 / 중성화 1.6 → 비율 1.125를 그대로 노령 구간에도 적용.
   var NEUTER_MULTIPLIER = {
@@ -300,6 +316,7 @@
       chip.addEventListener("click", function () {
         state.species = chip.dataset.speciesDetail;
         setChipPressed("[data-species-detail]", state.species, "speciesDetail");
+        updateActivityOptions(state.species);
         updateLifeStageBadge();
       });
     });
@@ -362,6 +379,7 @@
     if (state.weight) $("detail-weight").value = state.weight;
     $("detail-age-years").value = state.ageYears;
     $("detail-age-months").value = state.ageMonths;
+    updateActivityOptions(state.species);
     $("detail-activity").value = state.activity;
     $("detail-neuter").value = state.neuter;
     $("detail-repro").value = state.repro;
@@ -373,6 +391,19 @@
     var wrap = $("detail-cup-weight-group");
     if (!wrap) return;
     wrap.classList.toggle("hidden", state.foodType !== "dry");
+  }
+
+  function updateActivityOptions(species) {
+    var select = $("detail-activity");
+    if (!select) return;
+    var labels = ACTIVITY_LABELS[species] || ACTIVITY_LABELS.dog;
+    var previousValue = select.value;
+    Array.prototype.forEach.call(select.options, function (option) {
+      if (labels[option.value]) {
+        option.textContent = labels[option.value];
+      }
+    });
+    select.value = previousValue;
   }
 
   function updateLifeStageBadge() {
