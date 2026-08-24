@@ -150,7 +150,7 @@
   var defaultState = {
     species: "dog",
     weight: null,
-    ageYears: 0,
+    ageYears: null,
     ageMonths: 0,
     activity: "normal",
     neuter: "neutered",
@@ -231,7 +231,9 @@
     setChipPressed("[data-species-simple]", state.species, "speciesSimple");
 
     if (state.weight) $("simple-weight").value = state.weight;
-    $("simple-age-years").value = state.ageYears;
+    if (state.ageYears !== null && state.ageYears !== undefined) {
+      $("simple-age-years").value = state.ageYears;
+    }
     $("simple-age-months").value = state.ageMonths;
 
     var form = $("simple-form");
@@ -246,8 +248,8 @@
       switchToDetailMode();
     });
 
-    // 재방문 시 이미 체중이 저장되어 있으면 자동으로 계산 결과까지 복원
-    if (state.weight && state.mode === "simple") {
+    // 재방문 시 이미 체중·나이가 저장되어 있으면 자동으로 계산 결과까지 복원
+    if (state.weight && state.ageYears !== null && state.mode === "simple") {
       runSimpleCalculation(true);
     }
   }
@@ -264,8 +266,17 @@
     }
     clearError(errorEl);
 
+    var ageYearsRaw = $("simple-age-years").value;
+    var ageErrorEl = $("simple-age-error");
+    if (ageYearsRaw === "") {
+      showError(ageErrorEl, "나이(년)를 선택해주세요.");
+      $("simple-result").classList.add("hidden");
+      return;
+    }
+    clearError(ageErrorEl);
+
     state.weight = weight;
-    state.ageYears = parseInt($("simple-age-years").value, 10) || 0;
+    state.ageYears = parseInt(ageYearsRaw, 10) || 0;
     state.ageMonths = parseInt($("simple-age-months").value, 10) || 0;
     state.activity = "normal";
     state.neuter = "neutered";
@@ -381,7 +392,9 @@
     setChipPressed("[data-species-detail]", state.species, "speciesDetail");
     setChipPressed("[data-foodtype]", state.foodType, "foodtype");
     if (state.weight) $("detail-weight").value = state.weight;
-    $("detail-age-years").value = state.ageYears;
+    if (state.ageYears !== null && state.ageYears !== undefined) {
+      $("detail-age-years").value = state.ageYears;
+    }
     $("detail-age-months").value = state.ageMonths;
     updateActivityOptions(state.species);
     $("detail-activity").value = state.activity;
@@ -413,8 +426,23 @@
   }
 
   function updateLifeStageBadge() {
-    var weight = parseFloat($("detail-weight").value) || 0;
-    var years = parseInt($("detail-age-years").value, 10) || 0;
+    var yearsRaw = $("detail-age-years").value;
+
+    if (yearsRaw === "") {
+      // 나이(년)를 아직 선택하지 않은 상태 — 생애주기를 섣불리 판정하지 않고 선택을 유도한다.
+      $("detail-lifestage-badge").textContent = "-";
+      var groups = [$("detail-activity-group"), $("detail-neuter-group")];
+      groups.forEach(function (g) {
+        if (!g) return;
+        g.classList.add("is-disabled");
+      });
+      $("detail-activity").disabled = true;
+      $("detail-neuter").disabled = true;
+      $("detail-activity-note").textContent = "나이(년)를 선택하면 생애주기가 자동으로 판정돼요.";
+      return;
+    }
+
+    var years = parseInt(yearsRaw, 10) || 0;
     var months = parseInt($("detail-age-months").value, 10) || 0;
     var totalMonths = totalMonthsFrom(years, months);
     var stage = getLifeStage(state.species, totalMonths, $("detail-repro").value);
@@ -453,8 +481,17 @@
     }
     clearError(errorEl);
 
+    var ageYearsRaw = $("detail-age-years").value;
+    var ageErrorEl = $("detail-age-error");
+    if (ageYearsRaw === "") {
+      showError(ageErrorEl, "나이(년)를 선택해주세요.");
+      $("detail-result").classList.add("hidden");
+      return;
+    }
+    clearError(ageErrorEl);
+
     state.weight = weight;
-    state.ageYears = parseInt($("detail-age-years").value, 10) || 0;
+    state.ageYears = parseInt(ageYearsRaw, 10) || 0;
     state.ageMonths = parseInt($("detail-age-months").value, 10) || 0;
     state.activity = $("detail-activity").value;
     state.neuter = $("detail-neuter").value;
@@ -556,7 +593,7 @@
 
     // 재방문 시 마지막으로 보고 있던 모드가 상세모드였다면 그 화면으로 복원한다.
     // (간편모드였던 경우는 initSimpleMode 내부에서 이미 복원됨)
-    if (state.mode === "detail" && state.weight) {
+    if (state.mode === "detail" && state.weight && state.ageYears !== null) {
       switchToDetailMode();
       runDetailCalculation();
     }
@@ -585,17 +622,19 @@
         }
         restoreDetailFormFromState();
         updateLifeStageBadge();
-        if (state.weight) {
+        if (state.weight && state.ageYears !== null) {
           runDetailCalculation();
         }
       } else {
         if (state.weight) {
           $("simple-weight").value = state.weight;
         }
-        $("simple-age-years").value = state.ageYears;
+        if (state.ageYears !== null && state.ageYears !== undefined) {
+          $("simple-age-years").value = state.ageYears;
+        }
         $("simple-age-months").value = state.ageMonths;
         setChipPressed("[data-species-simple]", state.species, "speciesSimple");
-        if (state.weight) {
+        if (state.weight && state.ageYears !== null) {
           runSimpleCalculation(true);
         }
       }

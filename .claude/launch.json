@@ -4,8 +4,8 @@
     {
       "name": "petcalc-static",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8939"],
-      "port": 8939
+      "runtimeArgs": ["-m", "http.server", "8940"],
+      "port": 8940
     }
   ]
 }

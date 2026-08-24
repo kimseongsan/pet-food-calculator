@@ -72,6 +72,7 @@
             </select>
           </div>
         </div>
+        <p class="field-error" id="simple-age-error" role="alert"></p>
         <p class="field-hint">
           임신·수유 중이라면
           <a href="#" id="goto-detail-preg" class="small-link">상세모드에서 직접 선택하세요</a>
@@ -136,6 +137,7 @@
             <select id="detail-age-months" aria-label="나이 - 개월"></select>
           </div>
         </div>
+        <p class="field-error" id="detail-age-error" role="alert"></p>
         <p class="field-hint">자동 판정된 생애주기: <strong id="detail-lifestage-badge">-</strong></p>
       </div>
 
@@ -303,9 +305,20 @@
 
 <script>
   // 나이 선택 드롭다운(년/월)을 정적으로 채워넣는다.
+  // 년(年) 선택은 기본값 없이 시작해 "0살"이 실수로 자동 선택되는 일이 없도록 한다.
+  // (0살 0개월은 자견/자묘 급성장기로 판정되어 활동량 입력이 잠기므로, 나이를 안 건드리고
+  // 넘어가면 "왜 활동량이 선택 안 되지" 하는 혼란으로 이어질 수 있음)
   (function () {
-    function fillSelect(id, max) {
+    function fillSelect(id, max, withPlaceholder) {
       var select = document.getElementById(id);
+      if (withPlaceholder) {
+        var placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.textContent = "선택";
+        placeholder.disabled = true;
+        placeholder.selected = true;
+        select.appendChild(placeholder);
+      }
       for (var i = 0; i <= max; i++) {
         var opt = document.createElement("option");
         opt.value = i;
@@ -313,10 +326,10 @@
         select.appendChild(opt);
       }
     }
-    fillSelect("simple-age-years", 20);
-    fillSelect("simple-age-months", 11);
-    fillSelect("detail-age-years", 20);
-    fillSelect("detail-age-months", 11);
+    fillSelect("simple-age-years", 20, true);
+    fillSelect("simple-age-months", 11, false);
+    fillSelect("detail-age-years", 20, true);
+    fillSelect("detail-age-months", 11, false);
   })();
 </script>
 <script src="js/calculator.js"></script>
