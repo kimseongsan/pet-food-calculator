@@ -182,8 +182,18 @@
       </div>
 
       <div class="form-group">
-        <label for="detail-kcal100">사료 100g당 칼로리 (kcal)</label>
-        <input type="number" id="detail-kcal100" inputmode="decimal" min="1" placeholder="예: 380 (제품 포장지 참고)">
+        <span id="detail-pack-label">사료 포장지의 총 열량 · 총 내용량</span>
+        <div class="field-row" role="group" aria-labelledby="detail-pack-label">
+          <div>
+            <label for="detail-pack-kcal" class="visually-hidden">총 열량 (kcal)</label>
+            <input type="number" id="detail-pack-kcal" inputmode="decimal" min="1" placeholder="총 열량 예: 3800kcal">
+          </div>
+          <div>
+            <label for="detail-pack-weight" class="visually-hidden">총 내용량 (g)</label>
+            <input type="number" id="detail-pack-weight" inputmode="decimal" min="1" placeholder="총 내용량 예: 1000g">
+          </div>
+        </div>
+        <p class="field-hint">포장지에 적힌 총 열량(kcal)과 총 내용량(g)을 입력하면 100g당 칼로리를 자동으로 계산해요.</p>
       </div>
 
       <div class="form-group" id="detail-cup-weight-group">
@@ -206,7 +216,7 @@
         <p class="result-sub">1일 총 급여량: <strong id="detail-daily-gram">-</strong></p>
         <p class="result-sub" id="detail-per-meal">-</p>
       </div>
-      <p class="result-note hidden" id="detail-kcal100-missing">100g당 칼로리를 입력하면 정확한 g수를 계산해드려요.</p>
+      <p class="result-note hidden" id="detail-kcal100-missing">사료 포장지의 총 열량과 총 내용량을 입력하면 정확한 g수를 계산해드려요.</p>
 
       <div id="visual-wrap" class="visual-wrap hidden">
         <div id="visual-svg-wrap"></div>

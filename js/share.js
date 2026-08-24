@@ -14,7 +14,8 @@
     neuter: "nt",
     repro: "rp",
     foodType: "ft",
-    kcal100: "kc",
+    packKcal: "pk",
+    packWeight: "pw",
     cupWeight: "cw",
     mode: "mode"
   };
@@ -46,7 +47,7 @@
       var stateKey = reverseMap[key];
       if (!stateKey) return;
       found = true;
-      if (["weight", "ageYears", "ageMonths", "kcal100", "cupWeight"].indexOf(stateKey) !== -1) {
+      if (["weight", "ageYears", "ageMonths", "packKcal", "packWeight", "cupWeight"].indexOf(stateKey) !== -1) {
         partial[stateKey] = parseFloat(value);
       } else {
         partial[stateKey] = value;

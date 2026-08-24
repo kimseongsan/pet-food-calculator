@@ -156,6 +156,8 @@
     neuter: "neutered",
     repro: "none",
     foodType: "dry",
+    packKcal: null,
+    packWeight: null,
     kcal100: null,
     cupWeight: 90,
     foodTotalAmount: null,
@@ -355,7 +357,7 @@
         // TODO: 사료 데이터베이스 검색 연동 (3차 스테이지 9단계에서 실제 검색으로 교체 예정)
         // 검색 기능이 준비되기 전까지는 상세모드의 수동 칼로리 입력으로 안내한다.
         switchToDetailMode();
-        var input = $("detail-kcal100");
+        var input = $("detail-pack-kcal");
         if (input) {
           input.focus();
         }
@@ -383,7 +385,8 @@
     $("detail-activity").value = state.activity;
     $("detail-neuter").value = state.neuter;
     $("detail-repro").value = state.repro;
-    if (state.kcal100) $("detail-kcal100").value = state.kcal100;
+    if (state.packKcal) $("detail-pack-kcal").value = state.packKcal;
+    if (state.packWeight) $("detail-pack-weight").value = state.packWeight;
     if (state.cupWeight) $("detail-cup-weight").value = state.cupWeight;
   }
 
@@ -453,7 +456,13 @@
     state.activity = $("detail-activity").value;
     state.neuter = $("detail-neuter").value;
     state.repro = $("detail-repro").value;
-    state.kcal100 = parseFloat($("detail-kcal100").value) || null;
+    state.packKcal = parseFloat($("detail-pack-kcal").value) || null;
+    state.packWeight = parseFloat($("detail-pack-weight").value) || null;
+    // 포장지의 총 열량 ÷ 총 내용량 × 100 으로 100g당 칼로리를 역산한다.
+    state.kcal100 =
+      state.packKcal && state.packWeight && state.packWeight > 0
+        ? (state.packKcal / state.packWeight) * 100
+        : null;
     state.cupWeight = parseFloat($("detail-cup-weight").value) || 90;
     state.mode = "detail";
     saveState(state);
