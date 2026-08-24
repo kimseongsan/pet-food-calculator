@@ -1,47 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://example.com/</loc>
+    <loc>https://pet-food-calculator-eta.vercel.app/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://example.com/faq.html</loc>
+    <loc>https://pet-food-calculator-eta.vercel.app/faq.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://example.com/about.html</loc>
+    <loc>https://pet-food-calculator-eta.vercel.app/about.html</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://example.com/privacy.html</loc>
+    <loc>https://pet-food-calculator-eta.vercel.app/privacy.html</loc>
     <changefreq>yearly</changefreq>
     <priority>0.1</priority>
   </url>
   <url>
-    <loc>https://example.com/terms.html</loc>
+    <loc>https://pet-food-calculator-eta.vercel.app/terms.html</loc>
     <changefreq>yearly</changefreq>
     <priority>0.1</priority>
   </url>
   <url>
-    <loc>https://example.com/blog/</loc>
+    <loc>https://pet-food-calculator-eta.vercel.app/blog/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://example.com/blog/weight-only-is-not-enough.html</loc>
+    <loc>https://pet-food-calculator-eta.vercel.app/blog/weight-only-is-not-enough.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://example.com/blog/breed-weight-guide.html</loc>
+    <loc>https://pet-food-calculator-eta.vercel.app/blog/breed-weight-guide.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://example.com/blog/common-feeding-mistakes.html</loc>
+    <loc>https://pet-food-calculator-eta.vercel.app/blog/common-feeding-mistakes.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
