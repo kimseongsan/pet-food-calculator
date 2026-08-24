@@ -197,9 +197,15 @@
       </div>
 
       <div class="form-group" id="detail-cup-weight-group">
-        <label for="detail-cup-weight">일반 종이컵(180ml) 기준 사료 무게 (g) — 선택</label>
-        <input type="number" id="detail-cup-weight" inputmode="decimal" min="1" placeholder="미입력 시 90g으로 추정">
-        <p class="field-hint">집에 있는 일반 종이컵 한 컵(180ml)에 사료를 담으면 대략 몇 g인지 입력해주세요.</p>
+        <label for="detail-cup-weight">일반 종이컵(180ml) 기준 사료 무게 — 선택</label>
+        <div class="field-row">
+          <input type="number" id="detail-cup-weight" inputmode="decimal" min="0.001" placeholder="미입력 시 90g으로 추정">
+          <select id="detail-cup-weight-unit" aria-label="단위">
+            <option value="g" selected>g</option>
+            <option value="kg">kg</option>
+          </select>
+        </div>
+        <p class="field-hint">집에 있는 일반 종이컵 한 컵(180ml)에 사료를 담으면 대략 얼마인지 입력해주세요.</p>
       </div>
 
       <button type="submit" class="btn btn-primary">계산하기</button>

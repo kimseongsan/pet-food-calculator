@@ -159,7 +159,9 @@
     packKcal: null,
     packWeight: null,
     kcal100: null,
-    cupWeight: 90,
+    cupWeight: null,
+    cupWeightInput: null,
+    cupWeightUnit: "g",
     foodTotalAmount: null,
     foodTotalUnit: "g",
     mode: "simple"
@@ -387,7 +389,8 @@
     $("detail-repro").value = state.repro;
     if (state.packKcal) $("detail-pack-kcal").value = state.packKcal;
     if (state.packWeight) $("detail-pack-weight").value = state.packWeight;
-    if (state.cupWeight) $("detail-cup-weight").value = state.cupWeight;
+    if (state.cupWeightInput) $("detail-cup-weight").value = state.cupWeightInput;
+    $("detail-cup-weight-unit").value = state.cupWeightUnit;
   }
 
   function toggleCupWeightField() {
@@ -463,7 +466,14 @@
       state.packKcal && state.packWeight && state.packWeight > 0
         ? (state.packKcal / state.packWeight) * 100
         : null;
-    state.cupWeight = parseFloat($("detail-cup-weight").value) || 90;
+    state.cupWeightInput = parseFloat($("detail-cup-weight").value) || null;
+    state.cupWeightUnit = $("detail-cup-weight-unit").value;
+    // kg으로 입력해도 상관없도록 g으로 환산해서 계산에 사용한다. 미입력 시 90g으로 추정.
+    state.cupWeight = state.cupWeightInput
+      ? state.cupWeightUnit === "kg"
+        ? state.cupWeightInput * 1000
+        : state.cupWeightInput
+      : 90;
     state.mode = "detail";
     saveState(state);
 

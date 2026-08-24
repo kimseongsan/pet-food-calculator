@@ -252,6 +252,17 @@ select:disabled {
   cursor: not-allowed;
 }
 
+/* 숫자 입력창의 증감 스피너(위아래 화살표)도 다른 입력창과 다르게 튀어 보여서 제거한다. */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {

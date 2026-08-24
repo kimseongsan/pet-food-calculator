@@ -16,7 +16,8 @@
     foodType: "ft",
     packKcal: "pk",
     packWeight: "pw",
-    cupWeight: "cw",
+    cupWeightInput: "cwv",
+    cupWeightUnit: "cwu",
     mode: "mode"
   };
 
@@ -47,7 +48,7 @@
       var stateKey = reverseMap[key];
       if (!stateKey) return;
       found = true;
-      if (["weight", "ageYears", "ageMonths", "packKcal", "packWeight", "cupWeight"].indexOf(stateKey) !== -1) {
+      if (["weight", "ageYears", "ageMonths", "packKcal", "packWeight", "cupWeightInput"].indexOf(stateKey) !== -1) {
         partial[stateKey] = parseFloat(value);
       } else {
         partial[stateKey] = value;
