@@ -234,6 +234,24 @@ textarea {
   font-family: inherit;
 }
 
+/* 브라우저(특히 Safari/iOS)의 네이티브 select 크롬을 지우고 다른 입력창과 동일한
+   플랫 스타일로 통일한다. 화살표는 배경 SVG로 직접 그린다. */
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding-right: 38px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%2386868c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='5 7.5 10 12.5 15 7.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  cursor: pointer;
+}
+
+select:disabled {
+  cursor: not-allowed;
+}
+
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
